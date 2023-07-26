@@ -1,17 +1,21 @@
 "use client";
 
+import Button, { ButtonTypes } from "@/components/Button";
+import TextInput from "@/components/TextInput";
+import useMainStore from "@/store/main";
+import { toastError } from "@/utils/toast";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import useMainStore from "@/store/main";
-import { FieldValues, useForm, useFormState } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { supabase } from "../initSupabase";
-import { useRouter } from "next/navigation";
-import FormInput from "@/components/FormInput";
-import Button, { ButtonTypes } from "@/components/Button";
-import { Session } from "inspector";
-import { toastError } from "@/utils/toast";
+
+type FormValues = {
+  email: string;
+  password: string;
+};
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -31,12 +35,14 @@ export default function Login() {
     })
     .required();
 
-  const { handleSubmit, control } = useForm({
+  const {
+    handleSubmit,
+    register,
+    formState: { isValid },
+  } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-
-  const { isValid, errors } = useFormState({ control });
 
   const hanldeSignIn = useCallback(
     async (data: any) => {
@@ -92,16 +98,13 @@ export default function Login() {
             onSubmit={handleSubmit(hanldeSignIn)}
             className="mt-6 w-full items-stretch"
           >
-            <FormInput
-              control={control}
-              name="email"
+            <TextInput
+              {...register("email")}
               type="text"
               placeholder="Email address"
             />
-
-            <FormInput
-              control={control}
-              name="password"
+            <TextInput
+              {...register("password")}
               type="password"
               placeholder="Password"
               className="mt-3"

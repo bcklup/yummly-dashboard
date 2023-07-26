@@ -52,7 +52,7 @@ const TextInput: React.FC<TextInputProps> = ({
           } ${
             suffixComponent ? "pr-14" : "pr-3"
           } py-2 text-sm font-light text-gray-900 placeholder:text-gray-500 focus:z-10 focus:border-primary focus:outline-none focus:ring-primary ${className} ${
-            rest.disabled && "bg-offwhiteBG"
+            rest.disabled && "bg-primary-100"
           }`}
           {...rest}
         />

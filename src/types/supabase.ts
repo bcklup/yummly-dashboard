@@ -3,8 +3,7 @@ export type Json =
   | number
   | boolean
   | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+  | { [key: string]: Json | undefined };
 
 export interface Database {
   public: {

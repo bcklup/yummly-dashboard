@@ -1,7 +1,7 @@
-import { Menu, Transition } from '@headlessui/react';
-import React, { Fragment, useMemo } from 'react';
-import { FiCheck, FiChevronDown } from 'react-icons/fi';
-import { twMerge } from 'tailwind-merge';
+import { Menu, Transition } from "@headlessui/react";
+import React, { Fragment, useMemo } from "react";
+import { FiCheck, FiChevronDown } from "react-icons/fi";
+import { twMerge } from "tailwind-merge";
 
 type Props = {
   items: any[];
@@ -28,7 +28,7 @@ export const Dropdown: React.FC<Props> = ({
     if (selected) {
       return renderItem ? renderItem(selected) : selected;
     }
-    return placeholder || 'Select...';
+    return placeholder || "Select...";
   }, [selected, renderItem, placeholder]);
 
   return (
@@ -38,8 +38,8 @@ export const Dropdown: React.FC<Props> = ({
           disabled={disabled}
           className={twMerge(
             className,
-            'inline-flex w-full items-center justify-between rounded-sm border border-gray-300 bg-white py-2 px-4 font-light text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-100',
-            disabled ? 'bg-neutral-100' : ''
+            "inline-flex w-full items-center justify-between rounded-sm border border-gray-300 bg-white px-4 py-2 font-light text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-100",
+            disabled ? "bg-neutral-100" : ""
           )}
         >
           {display}
@@ -59,11 +59,11 @@ export const Dropdown: React.FC<Props> = ({
         <Menu.Items
           className={twMerge(
             menuClassName,
-            'absolute right-0 z-10 mt-2 w-full origin-top-right rounded-sm bg-white shadow-lg ring-1 ring-black/5 focus:outline-none'
+            "absolute right-0 z-10 mt-2 w-full origin-top-right rounded-sm bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
           )}
         >
           <div className="py-2">
-            {typeof items[0] === 'string'
+            {typeof items[0] === "string"
               ? items.map((item) => (
                   <Menu.Item key={item}>
                     {({ active }) => (
@@ -74,11 +74,11 @@ export const Dropdown: React.FC<Props> = ({
                           onChange(item);
                         }}
                         className={twMerge(
-                          selected === item && 'font-normal text-gray-900',
+                          selected === item && "font-normal text-gray-900",
                           active
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-700',
-                          'flex flex-row justify-between px-4 py-2 text-base font-light '
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "flex flex-row justify-between px-4 py-2 text-base font-light "
                         )}
                       >
                         {item}
@@ -100,11 +100,11 @@ export const Dropdown: React.FC<Props> = ({
                         }}
                         className={twMerge(
                           selected === item.value &&
-                            'font-normal text-gray-900',
+                            "font-normal text-gray-900",
                           active
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-700',
-                          'flex flex-row justify-between px-4 py-2 text-base font-light '
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "flex flex-row justify-between px-4 py-2 text-base font-light "
                         )}
                       >
                         {renderItem ? renderItem(item) : item.name}

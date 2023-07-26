@@ -110,7 +110,7 @@ const Page = () => {
           disabled={isLoading}
         />
       </div>
-      <Table columnDef={columns} data={recipes} />
+      <Table<RecipeRow> columnDef={columns} data={recipes} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, ReactNode } from 'react';
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, ReactNode } from "react";
 
 interface ModalProps {
   isOpen: boolean;
