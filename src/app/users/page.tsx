@@ -3,9 +3,9 @@
 import useMainStore from "@/store/main";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { supabase } from "./initSupabase";
+import { supabase } from "@/app/initSupabase";
 
-export default function Home() {
+const Page = () => {
   const router = useRouter();
   const { setSession, setProfile, clearSession } = useMainStore();
 
@@ -37,9 +37,7 @@ export default function Home() {
     startup();
   }, []);
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <div></div>
-    </main>
-  );
-}
+  return <div>USERS PAGE</div>;
+};
+
+export default Page;
