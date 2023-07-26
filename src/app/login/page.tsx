@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import FormInput from "@/components/FormInput";
 import Button, { ButtonTypes } from "@/components/Button";
 import { Session } from "inspector";
+import { toastError } from "@/utils/toast";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -19,7 +20,7 @@ export default function Login() {
 
   useEffect(() => {
     if (session && session.user) {
-      router.replace("/users");
+      router.replace("/recipes");
     }
   }, []);
 
@@ -40,12 +41,15 @@ export default function Login() {
   const hanldeSignIn = useCallback(
     async (data: any) => {
       setIsLoading(true);
+      console.log("[Log] data, isValid", { data, isValid });
       if (!data || !isValid) return;
 
       const { error, data: resData } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
+
+      console.log("[Log] error, resData", { error, resData });
 
       if (resData.session) {
         setSession(resData.session);
@@ -56,10 +60,11 @@ export default function Login() {
           .eq("user_id", resData.session.user.id);
 
         setProfile(!error && profileData ? profileData[0] : null);
-        router.push("/users");
+        router.push("/recipes");
         setIsLoading(false);
       } else {
         setIsLoading(false);
+        toastError(error?.message);
       }
     },
     [isValid]
@@ -69,7 +74,12 @@ export default function Login() {
     <div>
       <div className="flex flex-1 flex-col">
         <div className="flex flex-1 flex-col items-center justify-center space-y-6 p-8 pb-6">
-          <Image src="/logo-text.png" alt="SQR Logo" width={200} height={80} />
+          <Image
+            src="/logo-text.png"
+            alt="Yummly Logo"
+            width={200}
+            height={80}
+          />
           <div>
             <h4 className="text-center text-lg font-bold">
               Welcome to Yummly Admin Dashboard
@@ -84,7 +94,7 @@ export default function Login() {
           >
             <FormInput
               control={control}
-              name="login"
+              name="email"
               type="text"
               placeholder="Email address"
             />

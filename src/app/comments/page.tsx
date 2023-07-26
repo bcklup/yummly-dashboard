@@ -14,7 +14,7 @@ const Page = () => {
     }
   }, []);
 
-  return <div>USERS PAGE</div>;
+  return <div>COMMENTS PAGE</div>;
 };
 
 export default Page;

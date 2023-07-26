@@ -24,7 +24,7 @@ export default function Home() {
 
           setProfile(!error && profileData ? profileData[0] : null);
 
-          router.push("/users");
+          router.push("/recipes");
         } else throw new Error("Session is null");
       })
       .catch(() => {
