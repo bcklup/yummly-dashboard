@@ -1,5 +1,5 @@
-import React, { HTMLProps } from 'react';
-import { twMerge } from 'tailwind-merge';
+import React, { HTMLProps } from "react";
+import { twMerge } from "tailwind-merge";
 
 export type TextInputProps = {
   prefixComponent?: any;
@@ -23,13 +23,13 @@ const TextInput: React.FC<TextInputProps> = ({
   ...rest
 }) => {
   return (
-    <div className={twMerge('text-left', containerClassName)}>
+    <div className={twMerge("text-left", containerClassName)}>
       <label
         htmlFor={rest.name}
         className={
           label
-            ? twMerge('pl-1 text-sm text-secondary', labelClassname)
-            : 'sr-only'
+            ? twMerge("text-secondary pl-1 text-sm", labelClassname)
+            : "sr-only"
         }
       >
         {label || rest.name}
@@ -48,11 +48,11 @@ const TextInput: React.FC<TextInputProps> = ({
         <input
           ref={inputRef}
           className={`relative block min-h-[44px] w-full appearance-none rounded-sm border border-gray-300 ${
-            prefixComponent ? ' pl-14' : 'pl-3'
+            prefixComponent ? " pl-14" : "pl-3"
           } ${
-            suffixComponent ? 'pr-14' : 'pr-3'
+            suffixComponent ? "pr-14" : "pr-3"
           } py-2 text-sm font-light text-gray-900 placeholder:text-gray-500 focus:z-10 focus:border-primary focus:outline-none focus:ring-primary ${className} ${
-            rest.disabled && 'bg-offwhiteBG'
+            rest.disabled && "bg-offwhiteBG"
           }`}
           {...rest}
         />
@@ -60,7 +60,7 @@ const TextInput: React.FC<TextInputProps> = ({
 
       {errorMessage && (
         <span className="pl-1 text-xs leading-none text-red-500">
-          {'* ' + errorMessage}
+          {"* " + errorMessage}
         </span>
       )}
     </div>

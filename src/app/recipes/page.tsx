@@ -1,6 +1,6 @@
 "use client";
 
-import moment from "moment";
+import { format } from "date-fns";
 import useMainStore from "@/store/main";
 import { Database } from "@/types/supabase";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { RecipeRow } from "@/types/shorthands";
 import Button, { ButtonTypes } from "@/components/Button";
 import { DateTimeFormats } from "@/utils/parsers";
-import { RiFileSearchFill } from "react-icons/ri";
+import { AiFillEdit } from "react-icons/ai";
 
 const Page = () => {
   const router = useRouter();
@@ -66,7 +66,10 @@ const Page = () => {
       }),
       columnHelper.accessor(
         (row) =>
-          moment(row.created_at).format(DateTimeFormats.DisplayDateTimeShort),
+          format(
+            new Date(row.created_at || ""),
+            DateTimeFormats.DisplayDateTimeShort
+          ),
         { header: "Date Created", id: "created_at" }
       ),
 
@@ -85,7 +88,7 @@ const Page = () => {
               className="w-full justify-center border-none p-0"
               onClick={() => handleOpenModal(originalData.id)}
               prefixComponent={
-                <RiFileSearchFill className="h-5 w-5 text-neutral-400" />
+                <AiFillEdit className="h-5 w-5 text-primary-300" />
               }
             />
           );
