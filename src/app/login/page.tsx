@@ -76,6 +76,9 @@ export default function Login() {
     [isValid]
   );
 
+  const emailFields = register("email", { required: true });
+  const passwordFields = register("password", { required: true });
+
   return (
     <div>
       <div className="flex flex-1 flex-col">
@@ -99,15 +102,22 @@ export default function Login() {
             className="mt-6 w-full items-stretch"
           >
             <TextInput
-              {...register("email")}
-              type="text"
-              placeholder="Email address"
+              name={emailFields.name}
+              onChange={emailFields.onChange}
+              onBlur={emailFields.onBlur}
+              inputRef={emailFields.ref}
+              type="email"
+              className="mt-3"
+              placeholder="Enter Email Address"
             />
             <TextInput
-              {...register("password")}
+              name={passwordFields.name}
+              onChange={passwordFields.onChange}
+              onBlur={passwordFields.onBlur}
+              inputRef={passwordFields.ref}
               type="password"
-              placeholder="Password"
               className="mt-3"
+              placeholder="Enter Password"
             />
 
             <Button

@@ -1,10 +1,12 @@
 "use client";
 
 import { supabase } from "@/app/initSupabase";
+import { cloneDeep } from "lodash";
 import Button, { ButtonTypes } from "@/components/Button";
 import Modal from "@/components/Modal";
 import TextInput from "@/components/TextInput";
 import { RecipeRow } from "@/types/shorthands";
+import { toastError } from "@/utils/toast";
 import { Dialog } from "@headlessui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Image from "next/image";
@@ -14,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { FiArrowDown } from "react-icons/fi";
 import { GrClose } from "react-icons/gr";
 import * as yup from "yup";
+import IngredientsBuilder from "./IngredientsBuilder";
 
 type Props = {
   showModal: RecipeRow | string | null;
@@ -32,8 +35,12 @@ type FileWithPreview = {
   preview: string;
 } & File;
 
+export type Ingredients = { quantity: string; item: string }[];
+
 const RecipeModal = ({ showModal, onClose }: Props) => {
   const [imageFile, setImageFile] = useState<FileWithPreview | undefined>();
+  const [ingredients, setIngredients] = useState<Ingredients>([]);
+  const [instructions, setInstructions] = useState<string[]>([]);
 
   const isNewRecipe = useMemo(() => showModal === "new", [showModal]);
   const coreRecipe: RecipeRow | undefined = useMemo(
@@ -71,22 +78,10 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
 
   const handleClose = useCallback(() => {
     setImageFile(undefined);
+    setIngredients([]);
+    setInstructions([]);
     onClose();
-  }, []);
-
-  useEffect(() => {
-    reset({
-      title: coreRecipe?.title ? coreRecipe.title : "",
-      description: coreRecipe?.description ? coreRecipe.description : "",
-      video: coreRecipe?.video ? coreRecipe.video : "",
-      ingredients: coreRecipe?.ingredients
-        ? coreRecipe.ingredients?.ingredients || []
-        : [],
-      instructions: coreRecipe?.instructions
-        ? coreRecipe.instructions?.steps || []
-        : [],
-    });
-  }, [coreRecipe]);
+  }, [onClose, setIngredients, setInstructions]);
 
   const coreImage = useMemo(() => {
     if (coreRecipe && coreRecipe.hero_img) {
@@ -97,16 +92,39 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
     return "";
   }, [coreRecipe]);
 
+  useEffect(() => {
+    reset({
+      title: coreRecipe?.title ? coreRecipe.title : "",
+      description: coreRecipe?.description ? coreRecipe.description : "",
+      video: coreRecipe?.video ? coreRecipe.video : "",
+    });
+    if (coreRecipe?.ingredients?.ingredients?.length) {
+      setIngredients(cloneDeep(coreRecipe.ingredients.ingredients));
+    }
+    if (coreRecipe?.instructions?.steps?.length) {
+      setInstructions(cloneDeep(coreRecipe.instructions.steps));
+    }
+  }, [coreRecipe]);
+
+  useEffect(() => {
+    return () => {
+      if (imageFile?.preview) URL.revokeObjectURL(imageFile?.preview);
+    };
+  }, []);
+
   const titleFields = register("title", { required: true });
   const descriptionFields = register("description", { required: true });
   const videoFields = register("video", { required: true });
 
   const onDrop = useCallback((acceptedFiles: any) => {
-    console.log("[Log] acceptedFiles", { acceptedFiles });
-    setImageFile({
-      ...acceptedFiles[0],
-      preview: URL.createObjectURL(acceptedFiles[0]),
-    });
+    if (acceptedFiles.length) {
+      setImageFile({
+        ...acceptedFiles[0],
+        preview: URL.createObjectURL(acceptedFiles[0]),
+      });
+    } else {
+      toastError("Error: Invalid image format / File size too big.");
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -209,7 +227,7 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
                   https://drive.google.com/file/d/
                   <span className="bg-green-200">XXXXXXX</span>/view
                 </p>
-                <FiArrowDown className="self-center text-center" />
+                <FiArrowDown className="self-center text-center text-primary-400" />
                 <p className="text-center text-xs">
                   https://drive.google.com/uc?export=download&id=
                   <span className="bg-green-200">XXXXXXX</span>
@@ -252,6 +270,10 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
           <div className="flex w-full flex-row divide-x pt-2">
             <div className="flex flex-1 flex-col gap-2 pb-3 pr-2">
               <h6 className="pl-1 font-semibold">Ingredients</h6>
+              <IngredientsBuilder
+                ingredients={ingredients}
+                setIngredients={setIngredients}
+              />
             </div>
             <div className="flex flex-1 flex-col gap-2 pb-3 pl-2">
               <h6 className="pl-1 font-semibold">Directions</h6>
