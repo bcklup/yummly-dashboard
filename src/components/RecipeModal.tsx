@@ -35,12 +35,13 @@ type FileWithPreview = {
   preview: string;
 } & File;
 
-export type Ingredients = { quantity: string; item: string }[];
+export type Ingredients = { id: number; quantity: string; item: string }[];
+export type Instructions = { id: number; value: string }[];
 
 const RecipeModal = ({ showModal, onClose }: Props) => {
   const [imageFile, setImageFile] = useState<FileWithPreview | undefined>();
   const [ingredients, setIngredients] = useState<Ingredients>([]);
-  const [instructions, setInstructions] = useState<string[]>([]);
+  const [instructions, setInstructions] = useState<Instructions[]>([]);
 
   const isNewRecipe = useMemo(() => showModal === "new", [showModal]);
   const coreRecipe: RecipeRow | undefined = useMemo(
@@ -99,10 +100,24 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
       video: coreRecipe?.video ? coreRecipe.video : "",
     });
     if (coreRecipe?.ingredients?.ingredients?.length) {
-      setIngredients(cloneDeep(coreRecipe.ingredients.ingredients));
+      setIngredients(
+        cloneDeep(coreRecipe.ingredients.ingredients).map(
+          (item: any, index: number) => ({
+            ...item,
+            id: index,
+          })
+        )
+      );
     }
     if (coreRecipe?.instructions?.steps?.length) {
-      setInstructions(cloneDeep(coreRecipe.instructions.steps));
+      setInstructions(
+        cloneDeep(coreRecipe.instructions.steps).map(
+          (item: any, index: number) => ({
+            value: item,
+            id: index,
+          })
+        )
+      );
     }
   }, [coreRecipe]);
 
@@ -277,6 +292,10 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
             </div>
             <div className="flex flex-1 flex-col gap-2 pb-3 pl-2">
               <h6 className="pl-1 font-semibold">Directions</h6>
+              {/* <DirectionsBuilder
+                directions={instructions}
+                setDirections={setInstructions}
+              /> */}
             </div>
           </div>
         </div>
