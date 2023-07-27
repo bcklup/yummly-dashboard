@@ -12,6 +12,7 @@ import { RecipeRow } from "@/types/shorthands";
 import Button, { ButtonTypes } from "@/components/Button";
 import { DateTimeFormats } from "@/utils/parsers";
 import { AiFillEdit } from "react-icons/ai";
+import RecipeModal from "@/components/RecipeModal";
 
 const Page = () => {
   const router = useRouter();
@@ -20,7 +21,9 @@ const Page = () => {
     Database["public"]["Tables"]["recipes"]["Row"][]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [recipeModal, setRecipeModal] = useState<string | null>(null);
+  const [recipeModal, setRecipeModal] = useState<RecipeRow | string | null>(
+    null
+  );
 
   const columnHelper = createColumnHelper<RecipeRow>();
 
@@ -47,9 +50,12 @@ const Page = () => {
       });
   };
 
-  const handleOpenModal = useCallback((id: string) => {
-    setRecipeModal(id);
-  }, []);
+  const handleOpenModal = useCallback(
+    (id: RecipeRow | string | null) => () => {
+      setRecipeModal(id);
+    },
+    []
+  );
 
   const handleCloseModal = useCallback(() => {
     setRecipeModal(null);
@@ -86,7 +92,7 @@ const Page = () => {
               buttonType={ButtonTypes.GHOST}
               buttonSize="xs"
               className="w-full justify-center border-none p-0"
-              onClick={() => handleOpenModal(originalData.id)}
+              onClick={handleOpenModal(originalData)}
               prefixComponent={
                 <AiFillEdit className="h-5 w-5 text-primary-300" />
               }
@@ -108,9 +114,11 @@ const Page = () => {
           buttonSize="small"
           title="Add Recipe"
           disabled={isLoading}
+          onClick={handleOpenModal("new")}
         />
       </div>
       <Table<RecipeRow> columnDef={columns} data={recipes} />
+      <RecipeModal showModal={recipeModal} onClose={handleCloseModal} />
     </div>
   );
 };

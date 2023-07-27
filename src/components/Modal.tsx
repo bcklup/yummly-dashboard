@@ -1,47 +1,41 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, ReactNode } from "react";
+import { Fragment, PropsWithChildren, ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
-interface ModalProps {
+type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
-}
+  className?: string;
+  backgroundClassName?: string;
+} & PropsWithChildren;
 
-const Modal = ({ isOpen, onClose, children }: ModalProps) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  backgroundClassName,
+  className,
+  children,
+}: ModalProps) => {
   return (
-    <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-30" onClose={onClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black/25" />
-        </Transition.Child>
+    <Dialog open={isOpen} onClose={onClose} className={"relative z-50"}>
+      {/* The backdrop, rendered as a fixed sibling to the panel container */}
+      <div
+        className={twMerge("fixed inset-0 bg-black/30", backgroundClassName)}
+        aria-hidden="true"
+      />
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <Dialog.Panel className="w-full max-w-md overflow-auto rounded-sm bg-white p-6 text-left align-middle shadow-xl transition-all">
-                {children}
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </div>
-      </Dialog>
-    </Transition>
+      {/* Full-screen container to center the panel */}
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        {/* The actual dialog panel  */}
+        <Dialog.Panel
+          className={twMerge("mx-auto max-w-sm rounded bg-white", className)}
+        >
+          {children}
+          {/* ... */}
+        </Dialog.Panel>
+      </div>
+    </Dialog>
   );
 };
 

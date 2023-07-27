@@ -1,4 +1,5 @@
 import React, { HTMLProps } from "react";
+import { RefCallBack } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 
 export type TextInputProps = {
@@ -8,7 +9,7 @@ export type TextInputProps = {
   label?: string;
   labelClassname?: string;
   errorMessage?: string;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: RefCallBack;
 } & HTMLProps<HTMLInputElement>;
 
 const TextInput: React.FC<TextInputProps> = ({
