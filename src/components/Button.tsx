@@ -32,7 +32,7 @@ const ButtonContainerStyleMaps = {
     "bg-transparent disabled:bg-neutral-100 border border-neutral-100 ",
   [ButtonTypes.LINK]: "bg-transparent",
   [ButtonTypes.SUCCESS]: "bg-success-600 hover:bg-success",
-  [ButtonTypes.DESTRUCTIVE]: "bg-error-500 hover:bg-error-300",
+  [ButtonTypes.DESTRUCTIVE]: "bg-red-500 hover:bg-red-300",
 };
 
 const ButtonContainerSizeMaps = {

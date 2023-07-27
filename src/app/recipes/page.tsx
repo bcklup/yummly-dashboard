@@ -35,6 +35,7 @@ const Page = () => {
   }, []);
 
   const fetchRecipes = async () => {
+    console.log("[Log] called");
     setIsLoading(true);
     supabase
       .from("recipes")
@@ -118,7 +119,11 @@ const Page = () => {
         />
       </div>
       <Table<RecipeRow> columnDef={columns} data={recipes} />
-      <RecipeModal showModal={recipeModal} onClose={handleCloseModal} />
+      <RecipeModal
+        showModal={recipeModal}
+        onClose={handleCloseModal}
+        refreshTable={fetchRecipes}
+      />
     </div>
   );
 };

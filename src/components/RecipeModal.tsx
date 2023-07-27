@@ -1,47 +1,51 @@
 "use client";
 
 import { supabase } from "@/app/initSupabase";
-import { cloneDeep } from "lodash";
 import Button, { ButtonTypes } from "@/components/Button";
 import Modal from "@/components/Modal";
 import TextInput from "@/components/TextInput";
 import { RecipeRow } from "@/types/shorthands";
-import { toastError } from "@/utils/toast";
+import { resizeFileHero, resizeFileThumb } from "@/utils/parsers";
+import { toastError, toastSuccess } from "@/utils/toast";
 import { Dialog } from "@headlessui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { cloneDeep } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FiArrowDown } from "react-icons/fi";
 import { GrClose } from "react-icons/gr";
+import { v4 as uuidv4 } from "uuid";
 import * as yup from "yup";
+import { Json } from "@/types/supabase";
 import IngredientsBuilder from "./IngredientsBuilder";
+import InstructionsBuilder from "./InstructionsBuilder";
 
 type Props = {
   showModal: RecipeRow | string | null;
   onClose: () => void;
+  refreshTable: () => void;
 };
 
 type FormValues = {
   title: string;
   description: string;
   video: string;
-  ingredients: any[];
-  instructions: any[];
 };
 
 type FileWithPreview = {
+  file: File;
   preview: string;
-} & File;
+};
 
 export type Ingredients = { id: number; quantity: string; item: string }[];
 export type Instructions = { id: number; value: string }[];
 
-const RecipeModal = ({ showModal, onClose }: Props) => {
+const RecipeModal = ({ showModal, onClose, refreshTable }: Props) => {
   const [imageFile, setImageFile] = useState<FileWithPreview | undefined>();
   const [ingredients, setIngredients] = useState<Ingredients>([]);
-  const [instructions, setInstructions] = useState<Instructions[]>([]);
+  const [instructions, setInstructions] = useState<Instructions>([]);
 
   const isNewRecipe = useMemo(() => showModal === "new", [showModal]);
   const coreRecipe: RecipeRow | undefined = useMemo(
@@ -57,25 +61,31 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
       title: yup.string().required(),
       description: yup.string().required(),
       video: yup.string().required(),
-      ingredients: yup.array().required(),
-      instructions: yup.array().required(),
     })
     .required();
 
   const {
     register,
-    watch,
-    setValue,
+    handleSubmit,
     reset,
-    formState: { isValid, isDirty, errors },
+    formState: { isValid, errors },
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
 
+  console.log("[Log] isValid, erors", { isValid, errors });
+
   const isSubmitDisabled = useMemo(() => {
-    if (!isValid || (!isNewRecipe && !isDirty)) return true;
-  }, [isValid, isNewRecipe, isDirty]);
+    if (!isValid) return true;
+    if (
+      (!isNewRecipe || imageFile) &&
+      instructions.length > 0 &&
+      ingredients.length > 0
+    )
+      return false;
+    return true;
+  }, [isValid, isNewRecipe, ingredients, instructions, imageFile]);
 
   const handleClose = useCallback(() => {
     setImageFile(undefined);
@@ -131,10 +141,100 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
   const descriptionFields = register("description", { required: true });
   const videoFields = register("video", { required: true });
 
+  const handleDelete = async () => {
+    if (!isNewRecipe && coreRecipe) {
+      if (confirm("Are you sure you want to delete this recipe?") == true) {
+        await supabase.from("recipes").delete().eq("id", coreRecipe?.id);
+        await refreshTable();
+
+        toastSuccess("Success!");
+        handleClose();
+      }
+    }
+  };
+
+  const handleSave = async (data: any) => {
+    const imageName = `${uuidv4()}.jpeg`;
+    const parsedInstructions = instructions.map((item) => item.value);
+    if (isNewRecipe) {
+      supabase
+        .from("recipes")
+        .insert({
+          title: data.title,
+          description: data.description,
+          video: data.video,
+          hero_img: imageName,
+          ingredients: {
+            ingredients: ingredients as any,
+          },
+          instructions: {
+            steps: parsedInstructions as any,
+          },
+        })
+        .then(async ({ data, error }) => {
+          console.log("[Log] data,error", { data, error });
+          const hero = await resizeFileHero(imageFile!.file);
+          const thumb = await resizeFileThumb(imageFile!.file);
+          const { error: err1, data: data1 } = await supabase.storage
+            .from("recipe_photos")
+            .upload(`hero/${imageName}`, hero as File);
+          const { error: err2, data: data2 } = await supabase.storage
+            .from("recipe_photos")
+            .upload(`thumb/${imageName}`, thumb as File);
+          console.log("[Log] data1, err1", { data1, err1 });
+          console.log("[Log] data2, err2", { data2, err2 });
+          await refreshTable();
+
+          toastSuccess("Success!");
+          handleClose();
+        });
+    } else {
+      supabase
+        .from("recipes")
+        .update({
+          title: data.title,
+          description: data.description,
+          video: data.video,
+          hero_img: coreRecipe?.hero_img,
+          ingredients: {
+            ingredients: ingredients as any,
+          },
+          instructions: {
+            steps: parsedInstructions as any,
+          },
+        })
+        .eq("id", coreRecipe?.id || "")
+        .then(async ({ data, error }) => {
+          console.log("[Log] data,error", { data, error });
+          if (imageFile && !error) {
+            const hero = await resizeFileHero(imageFile!.file);
+            const thumb = await resizeFileThumb(imageFile!.file);
+            const { error: err1, data: data1 } = await supabase.storage
+              .from("recipe_photos")
+              .update(`hero/${coreRecipe?.hero_img}`, hero as File);
+            const { error: err2, data: data2 } = await supabase.storage
+              .from("recipe_photos")
+              .update(`thumb/${coreRecipe?.hero_img}`, thumb as File);
+            console.log("[Log] data1, err1", { data1, err1, hero });
+            console.log("[Log] data2, err2", { data2, err2, thumb });
+            await refreshTable();
+
+            toastSuccess("Success!");
+            handleClose();
+          } else {
+            await refreshTable();
+
+            toastSuccess("Success!");
+            handleClose();
+          }
+        });
+    }
+  };
+
   const onDrop = useCallback((acceptedFiles: any) => {
     if (acceptedFiles.length) {
       setImageFile({
-        ...acceptedFiles[0],
+        file: acceptedFiles[0],
         preview: URL.createObjectURL(acceptedFiles[0]),
       });
     } else {
@@ -156,7 +256,9 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
       <div className="flex justify-center self-center align-middle">
         <Image
           alt="Preview Image"
-          src={imageFile?.preview || coreImage || ""}
+          src={
+            imageFile?.preview || `${coreImage}?${new Date().getTime()}` || ""
+          }
           height={100}
           width={100}
           className="h-[100%] max-h-[300px] w-auto rounded-xl bg-contain"
@@ -292,31 +394,40 @@ const RecipeModal = ({ showModal, onClose }: Props) => {
             </div>
             <div className="flex flex-1 flex-col gap-2 pb-3 pl-2">
               <h6 className="pl-1 font-semibold">Directions</h6>
-              {/* <DirectionsBuilder
-                directions={instructions}
-                setDirections={setInstructions}
-              /> */}
+              <InstructionsBuilder
+                instructions={instructions}
+                setInstructions={setInstructions}
+              />
             </div>
           </div>
         </div>
       </div>
 
       <div className="flex flex-1 gap-3 rounded-b-xl border-t border-neutral-200 bg-white px-6 py-4">
-        <div className=" flex flex-1 items-center justify-end gap-3">
+        <div className=" flex flex-1 items-center justify-between">
           <Button
-            title="Cancel"
-            buttonType={ButtonTypes.GHOST}
-            onClick={handleClose}
-            buttonSize="small"
-            titleClassName="text-primary-500"
-            className="border-primary-500"
-          />
-          <Button
-            title={isNewRecipe ? "Submit" : "Save"}
-            disabled={isSubmitDisabled}
-            buttonType={ButtonTypes.PRIMARY}
+            title="Delete"
+            buttonType={ButtonTypes.DESTRUCTIVE}
+            onClick={handleDelete}
             buttonSize="small"
           />
+          <div className="flex flex-row gap-3">
+            <Button
+              title="Cancel"
+              buttonType={ButtonTypes.GHOST}
+              onClick={handleClose}
+              buttonSize="small"
+              titleClassName="text-primary-500"
+              className="border-primary-500"
+            />
+            <Button
+              title={isNewRecipe ? "Submit" : "Save"}
+              disabled={isSubmitDisabled}
+              buttonType={ButtonTypes.PRIMARY}
+              buttonSize="small"
+              onClick={handleSubmit(handleSave)}
+            />
+          </div>
         </div>
       </div>
     </Modal>
