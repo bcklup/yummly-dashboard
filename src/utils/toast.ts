@@ -4,7 +4,7 @@ export const toastError = (message?: string, options?: ToastOptions) => {
   const toastMsg = message || "Error occured. Please try again later.";
   toast.error(toastMsg, {
     theme: "colored",
-    position: "top-center",
+    position: "bottom-right",
     autoClose: 5000,
     hideProgressBar: true,
     closeOnClick: true,

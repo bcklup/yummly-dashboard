@@ -19,7 +19,7 @@ type FormValues = {
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { session, setSession, setProfile } = useMainStore();
+  const { session, setSession, clearSession, setProfile } = useMainStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -38,6 +38,7 @@ export default function Login() {
   const {
     handleSubmit,
     register,
+    reset,
     formState: { isValid },
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
@@ -55,19 +56,33 @@ export default function Login() {
         password: data.password,
       });
 
-      console.log("[Log] error, resData", { error, resData });
-
       if (resData.session) {
-        setSession(resData.session);
-
-        const { data: profileData, error } = await supabase
+        const { data: data2, error: error2 } = await supabase
           .from("profiles")
           .select()
-          .eq("user_id", resData.session.user.id);
+          .eq("user_id", resData.session.user.id)
+          .eq("is_admin", true)
+          .maybeSingle();
+        console.log("[Log] data2, error2", { data2, error2 });
+        if (error2 || !data2) {
+          supabase.auth.signOut().then(() => {
+            clearSession();
+            reset();
+            toastError("You do not have authorization to access the system.");
+            setIsLoading(false);
+          });
+        } else {
+          setSession(resData.session);
 
-        setProfile(!error && profileData ? profileData[0] : null);
-        router.push("/recipes");
-        setIsLoading(false);
+          const { data: profileData, error } = await supabase
+            .from("profiles")
+            .select()
+            .eq("user_id", resData.session.user.id);
+
+          setProfile(!error && profileData ? profileData[0] : null);
+          router.push("/recipes");
+          setIsLoading(false);
+        }
       } else {
         setIsLoading(false);
         toastError(error?.message);

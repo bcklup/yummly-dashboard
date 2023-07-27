@@ -8,6 +8,7 @@ export const supabase = createClient<Database>(
   {
     auth: {
       autoRefreshToken: true,
+      persistSession: true,
       detectSessionInUrl: false, // Prevents Supabase from evaluating window.location.href, breaking mobile
     },
   }
