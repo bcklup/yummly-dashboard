@@ -26,7 +26,7 @@ export default function Login() {
     if (session && session.user) {
       router.replace("/recipes");
     }
-  }, []);
+  }, [router, session]);
 
   const schema = yup
     .object({
