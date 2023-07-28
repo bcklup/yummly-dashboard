@@ -35,7 +35,6 @@ const Page = () => {
   }, []);
 
   const fetchRecipes = async () => {
-    console.log("[Log] called");
     setIsLoading(true);
     supabase
       .from("recipes")
@@ -108,7 +107,10 @@ const Page = () => {
   return (
     <div className="flex h-4/5 w-full flex-col rounded-lg bg-white p-4">
       <h1 className="text-xl font-bold">Recipes Management</h1>
-      <div className="mb-2 mt-6 flex w-full flex-row justify-end">
+      <div className="mb-4 flex w-full flex-row justify-between">
+        <p className="text-neutral-400">
+          Create, manage, and delete all the recipes in the Yummly Recipes App.
+        </p>
         <Button
           buttonType={ButtonTypes.PRIMARY}
           type="button"

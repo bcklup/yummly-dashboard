@@ -48,7 +48,6 @@ export default function Login() {
   const hanldeSignIn = useCallback(
     async (data: any) => {
       setIsLoading(true);
-      console.log("[Log] data, isValid", { data, isValid });
       if (!data || !isValid) return;
 
       const { error, data: resData } = await supabase.auth.signInWithPassword({
@@ -63,7 +62,6 @@ export default function Login() {
           .eq("user_id", resData.session.user.id)
           .eq("is_admin", true)
           .maybeSingle();
-        console.log("[Log] data2, error2", { data2, error2 });
         if (error2 || !data2) {
           supabase.auth.signOut().then(() => {
             clearSession();

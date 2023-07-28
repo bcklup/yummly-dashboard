@@ -23,8 +23,6 @@ export default function Table<T>({
   columnDef,
   responsive = true,
 }: TableProps<T>) {
-  // const [sort, setSort] = useState<SortingState>([]);
-
   const tableOptions: TableOptions<T> = {
     data,
     columns: columnDef,
@@ -35,7 +33,7 @@ export default function Table<T>({
   const table = useReactTable(tableOptions);
 
   return (
-    <div className="relative w-full overflow-x-auto rounded-lg bg-white">
+    <div className="relative mt-3 w-full overflow-x-auto rounded-lg border border-neutral-200 bg-white">
       {/* Mobile View */}
       {responsive && (
         <div className="w-full border-collapse sm:hidden">
@@ -111,14 +109,13 @@ export default function Table<T>({
           responsive ? "hidden sm:table" : "table"
         )}
       >
-        <thead className="bg-white text-xs uppercase">
+        <thead className="bg-primary text-xs uppercase text-white">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr
               key={headerGroup.id}
               className={twMerge("border-b border-neutral-50")}
             >
               {headerGroup.headers.map((header) => (
-                // Need to define action column as id: actions if want it to have border according to design
                 <th
                   key={header.id}
                   className={twMerge(
@@ -128,7 +125,7 @@ export default function Table<T>({
                   )}
                 >
                   {header.isPlaceholder ? null : (
-                    <div className="flex h-full w-full items-center justify-between gap-x-3 text-neutral-400">
+                    <div className="flex h-full w-full items-center justify-between gap-x-3 ">
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
@@ -148,7 +145,6 @@ export default function Table<T>({
                 className="border-b bg-white hover:bg-primary-100"
               >
                 {row.getVisibleCells().map((cell) => (
-                  // Need to define action column as id: actions if want it to have border according to design
                   <td
                     key={cell.id}
                     className={twMerge(

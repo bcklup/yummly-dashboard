@@ -1,7 +1,5 @@
 import "@/app/globals.css";
 import Sidebar from "@/components/Sidebar";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

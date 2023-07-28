@@ -81,7 +81,7 @@ const Sidebar = () => {
               </Link>
             </li>
 
-            {/* <li key="comments" className="group">
+            <li key="comments" className="group">
               <Link
                 href="/comments"
                 className={twMerge(
@@ -112,7 +112,7 @@ const Sidebar = () => {
                   )}
                 />
               </Link>
-            </li> */}
+            </li>
             {/* Disable until workable
           <li key="users" className="group">
             <Link
