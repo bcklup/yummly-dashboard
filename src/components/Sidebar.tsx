@@ -18,12 +18,15 @@ const Sidebar = () => {
   const router = useRouter();
   const { clearSession } = useMainStore();
 
-  const isCurrentRoute = useCallback((route: string) => {
-    let isRoot = route === "/recipes" && pathname === "/";
-    const urlPattern = new RegExp(`^\\${route}\\b`);
+  const isCurrentRoute = useCallback(
+    (route: string) => {
+      let isRoot = route === "/recipes" && pathname === "/";
+      const urlPattern = new RegExp(`^\\${route}\\b`);
 
-    return isRoot ? isRoot : urlPattern.test(pathname);
-  }, []);
+      return isRoot ? isRoot : urlPattern.test(pathname);
+    },
+    [pathname]
+  );
 
   const handleLogout = useCallback(() => {
     supabase.auth.signOut().then(() => {

@@ -38,7 +38,7 @@ const Page = () => {
         if (error || data.length <= 0) {
           setComments([]);
         } else {
-          setComments(data);
+          setComments(data as any);
         }
         setIsLoading(false);
       });
