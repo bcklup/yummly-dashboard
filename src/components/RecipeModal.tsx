@@ -296,7 +296,7 @@ const RecipeModal = ({ showModal, onClose, refreshTable }: Props) => {
 
       <div
         className={
-          "flex w-full flex-col gap-4 divide-y divide-dashed divide-neutral-300 bg-white px-6 py-3"
+          "flex max-h-[70vh] w-full flex-col gap-4 divide-y divide-dashed divide-neutral-300 overflow-scroll bg-white px-6 py-3"
         }
       >
         <div className=" flex w-full flex-col gap-1 divide-y">
