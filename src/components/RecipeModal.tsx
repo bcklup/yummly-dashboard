@@ -405,12 +405,14 @@ const RecipeModal = ({ showModal, onClose, refreshTable }: Props) => {
 
       <div className="flex flex-1 gap-3 rounded-b-xl border-t border-neutral-200 bg-white px-6 py-4">
         <div className=" flex flex-1 items-center justify-between">
-          <Button
-            title="Delete"
-            buttonType={ButtonTypes.DESTRUCTIVE}
-            onClick={handleDelete}
-            buttonSize="small"
-          />
+          {!isNewRecipe && (
+            <Button
+              title="Delete"
+              buttonType={ButtonTypes.DESTRUCTIVE}
+              onClick={handleDelete}
+              buttonSize="small"
+            />
+          )}
           <div className="flex flex-row gap-3">
             <Button
               title="Cancel"
