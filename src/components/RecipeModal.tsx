@@ -91,8 +91,9 @@ const RecipeModal = ({ showModal, onClose, refreshTable }: Props) => {
     setImageFile(undefined);
     setIngredients([]);
     setInstructions([]);
+    reset();
     onClose();
-  }, [onClose, setIngredients, setInstructions]);
+  }, [onClose, reset, setIngredients, setInstructions]);
 
   const coreImage = useMemo(() => {
     if (coreRecipe && coreRecipe.hero_img) {
